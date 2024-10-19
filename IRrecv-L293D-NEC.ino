@@ -22,7 +22,7 @@ constexpr uint8_t ENA {5};  // Pin for ENA (speed)
 
 // Variables to manage "stand-by" functionality
 constexpr uint32_t inactivityTimeout = 10000; // 10 seconds inactivity timeout
-unsigned long lastActivityTime = 0;  // Keeps track of the last time an IR code was received
+unsigned long lastActivityTime = 0;           // Keeps track of the last time an IR code was received
 
 // Debounce timing for the button interrupt
 unsigned long lastInterruptTime = 0;
@@ -54,19 +54,18 @@ uint16_t irReceive() {
   return received;
 }
 
-// Funzione per generare un tono utilizzando analogWrite()
+// Function to generate sound without using tone() and toneAC() that create problems with interrupts. This one is with analogWrite
 void playTone(int frequency, int duration) {
-  int period = 1000000 / frequency;  // Calcola il periodo in microsecondi
-  int halfPeriod = period / 2;       // Calcola la metà del periodo (per l'onda quadra)
+  int period = 1000000 / frequency;          // Calculates the period in milliseconds
+  int halfPeriod = period / 2;               // Calculates the half of the period (for a square wave)
 
   unsigned long startTime = millis();
   
   while (millis() - startTime < duration) {
-    analogWrite(BUZZER_PIN, 128);   // Imposta il duty cycle al 50% (onda quadra)
-    delayMicroseconds(halfPeriod);  // Attendi metà del periodo
-    
-    analogWrite(BUZZER_PIN, 0);     // Spegni il segnale PWM
-    delayMicroseconds(halfPeriod);  // Attendi l'altra metà del periodo
+    analogWrite(BUZZER_PIN, 128);            // Set the duty cycle at 50% (square wave)
+    delayMicroseconds(halfPeriod);           // Wait half of the period
+    analogWrite(BUZZER_PIN, 0);              // Turn off the PWM signal
+    delayMicroseconds(halfPeriod);           // Wait for the second half of the period
   }
 }
 
@@ -79,14 +78,14 @@ void setup() {
   Serial.begin(9600);
 
   // Pin for the Motor "ON"; Set the Pin as output
-  pinMode(LED_PIN, OUTPUT);   // Set up LED pin as output
+  pinMode(LED_PIN, OUTPUT);           // Set up LED pin as output
   pinMode(BUTTON_PIN, INPUT_PULLUP);  // Set up the Button Pin as "Pull-up" mode and "internal resistor" mode
-  pinMode(BUZZER_PIN, OUTPUT);  // Imposta il pin del buzzer come uscita
+  pinMode(BUZZER_PIN, OUTPUT);        // Imposta il pin del buzzer come uscita
  
   // Pins for the Motor Driver L293D: set all the Pins as "outputs"
-  pinMode(IN1, OUTPUT);       // Motor driver pin
-  pinMode(IN2, OUTPUT);       // Motor driver pin
-  pinMode(ENA, OUTPUT);       // Motor speed pin
+  pinMode(IN1, OUTPUT);               // Motor driver pin
+  pinMode(IN2, OUTPUT);               // Motor driver pin
+  pinMode(ENA, OUTPUT);               // Motor speed pin
 
   // Pin for the wake up Button: set the Pin as "input"
   pinMode(BUTTON_PIN, INPUT_PULLUP);  // Set button pin as input with internal pull-up
@@ -94,8 +93,8 @@ void setup() {
   // Initialize all the outputs turned off
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
-  analogWrite(ENA, 0);            // Motor Stop
-  digitalWrite(LED_PIN, LOW);     // LED turned off
+  analogWrite(ENA, 0);               // Motor Stop
+  digitalWrite(LED_PIN, LOW);        // LED turned off
 
   // Start IR receiver on the specified pin
   Serial.println("Inside setup()... next step: Start IR receiver)");
